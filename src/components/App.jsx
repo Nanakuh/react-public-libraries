@@ -8,7 +8,7 @@ const App = () => {
 
   // Obtener datos de la API al cargar la aplicación
   useEffect(() => {
-    fetch("https://openlibrary.org/subjects/science_fiction.json?limit=10")
+    fetch("https://openlibrary.org/subjects/science_fiction.json?limit=20")
       .then((response) => response.json())
       .then((data) => setBooks(data.works))
       .catch((error) => console.error("Error fetching data:", error));
