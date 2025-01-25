@@ -11,7 +11,7 @@ const App = () => {
     fetch("https://openlibrary.org/search.json?q=book&limit=40")
       .then((response) => response.json())
       .then((data) => {
-        const formattedBooks = data.docs.map((book) => ({
+        const booksReadyForUI = data.docs.map((book) => ({
           key: book.key || Math.random().toString(),
           title: book.title || "Unknown Title",
           cover: book.cover_i
@@ -23,7 +23,7 @@ const App = () => {
               : "Unknown", // Procesamos el autor aquí
         }));
 
-        setBooks(formattedBooks);
+        setBooks(booksReadyForUI);
       })
       .catch((error) => console.error("Error fetching data:", error));
   }, []);
