@@ -36,7 +36,7 @@ const App = () => {
           <BookCard
             key={book.key}
             title={book.title}
-            author={book.author} // Ahora pasamos directamente "author"
+            author={book.author}
             cover={book.cover}
           />
         ))}

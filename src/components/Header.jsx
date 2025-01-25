@@ -8,7 +8,7 @@ const Header = () => {
         textAlign: "center",
       }}
     >
-      <h1>Public Libraries</h1>
+      <h1>Complete List of Books</h1>
     </header>
   );
 };
