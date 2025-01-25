@@ -8,7 +8,7 @@ const App = () => {
 
   // Obtener datos de la API al cargar la aplicación
   useEffect(() => {
-    fetch("https://openlibrary.org/search.json?q=book&limit=10")
+    fetch("https://openlibrary.org/search.json?q=book&limit=40")
       .then((response) => response.json())
       .then((data) => {
         const formattedBooks = data.docs.map((book) => ({
@@ -17,7 +17,10 @@ const App = () => {
           cover: book.cover_i
             ? `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`
             : "https://via.placeholder.com/150",
-          author_name: book.author_name || ["Unknown"], // Pasamos el valor sin procesar
+          author:
+            Array.isArray(book.author_name) && book.author_name.length > 0
+              ? book.author_name[0]
+              : "Unknown", // Procesamos el autor aquí
         }));
 
         setBooks(formattedBooks);
@@ -33,8 +36,8 @@ const App = () => {
           <BookCard
             key={book.key}
             title={book.title}
-            author={book.author} // Ahora usamos la propiedad "author"
-            cover={book.cover} // Ahora usamos la propiedad "cover"
+            author={book.author} // Ahora pasamos directamente "author"
+            cover={book.cover}
           />
         ))}
       </main>
