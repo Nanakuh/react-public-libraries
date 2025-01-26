@@ -49,22 +49,26 @@ const App = () => {
   return (
     <div>
       <Header />
-      <main className="book-list">
-        {loading && <p className="loading-message">Loading books...</p>} {/* Mostrar mientras cargamos */}
-        {apiError && <p className="error-message">{apiError}</p>} {/* Mostrar si hay un error */}
-        {!loading && !apiError && books.map((book) => (
-          <BookCard
-            key={book.key}
-            title={book.title}
-            author={book.author}
-            cover={book.cover}
-          />
-        ))} {/* Mostrar los libros si no hay errores y no estamos cargando */}
+      <main className='book-list'>
+        {loading && <p className='loading-message'>Loading books...</p>}{" "}
+        {/* Mostrar mientras cargamos */}
+        {apiError && <p className='error-message'>{apiError}</p>}{" "}
+        {/* Mostrar si hay un error */}
+        {!loading &&
+          !apiError &&
+          books.map((book) => (
+            <BookCard
+              key={book.key}
+              title={book.title}
+              author={book.author}
+              cover={book.cover}
+            />
+          ))}{" "}
+        {/* Mostrar los libros si no hay errores y no estamos cargando */}
       </main>
       <Footer />
     </div>
   );
-  
 };
 
 export default App;
