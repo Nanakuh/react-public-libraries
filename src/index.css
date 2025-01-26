@@ -9,7 +9,7 @@ main {
 }
 
 h1 {
-  color: #333;
+  color: black;
 }
 
 .book-list {
@@ -20,12 +20,12 @@ h1 {
 }
 
 .book-card {
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  background-color: #d5fac3;
+  border: 1px solid #18511e;
+  border-radius: 10px;
   overflow: hidden;
   text-align: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.1);
 }
 
 .book-cover {
@@ -36,7 +36,7 @@ h1 {
 .book-title {
   font-size: 1.2rem;
   margin: 0.5rem 0;
-  color: #333;
+  color: black;
 }
 
 .book-author {
