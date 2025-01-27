@@ -5,21 +5,22 @@ import BookCard from "./BookCard";
 
 const App = () => {
   const [books, setBooks] = useState([]);
-  const [loading, setLoading] = useState(true); // Para saber si los datos están cargándose
-  const [apiError, setApiError] = useState(null); // Para guardar el mensaje de error
+  const [loading, setLoading] = useState(true);
+  const [apiError, setApiError] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [booksPerPage, setBooksPerPage] = useState(20); // Ahora es dinámico
 
-  // Obtener datos de la API al cargar la aplicación
   useEffect(() => {
     const fetchBooks = async () => {
-      setLoading(true); // Comenzamos en estado de carga
-      setApiError(null); // Reiniciamos cualquier error previo
+      setLoading(true);
+      setApiError(null);
 
       try {
         const response = await fetch(
-          "https://openlibrary.org/search.json?q=book&limit=40"
+          "https://openlibrary.org/search.json?q=book"
         );
         if (!response.ok) {
-          throw new Error(`Error: ${response.status} ${response.statusText}`); // Lanzar error si la respuesta no es 200 OK
+          throw new Error(`Error: ${response.status} ${response.statusText}`);
         }
 
         const data = await response.json();
@@ -35,28 +36,42 @@ const App = () => {
               : "Unknown",
         }));
 
-        setBooks(booksReadyForUI); // Actualizamos los libros en el estado
+        setBooks(booksReadyForUI);
       } catch (e) {
-        setApiError(e.message); // Guardamos el mensaje del error
+        setApiError(e.message);
       } finally {
-        setLoading(false); // Dejamos de estar en estado de carga
+        setLoading(false);
       }
     };
 
     fetchBooks();
   }, []);
 
+  const indexOfLastBook = currentPage * booksPerPage;
+  const indexOfFirstBook = indexOfLastBook - booksPerPage;
+  const currentBooks = books.slice(indexOfFirstBook, indexOfLastBook);
+
+  const goToNextPage = () => {
+    if (currentPage < Math.ceil(books.length / booksPerPage)) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
   return (
     <div>
       <Header />
       <main className='book-list'>
         {loading && <p className='loading-message'>Loading books...</p>}
-        {/* Mostrar mientras cargamos */}
         {apiError && <p className='error-message'>{apiError}</p>}
-        {/* Mostrar si hay un error */}
         {!loading &&
           !apiError &&
-          books.map((book) => (
+          currentBooks.map((book) => (
             <BookCard
               key={book.key}
               title={book.title}
@@ -64,7 +79,44 @@ const App = () => {
               cover={book.cover}
             />
           ))}
-        {/* Mostrar los libros si no hay errores y no estamos cargando */}
+
+        {!loading && !apiError && (
+          <div className='pagination-controls'>
+            <button
+              onClick={goToPreviousPage}
+              disabled={currentPage === 1}
+              className='pagination-button'
+            >
+              Previous
+            </button>
+            <span>
+              Page {currentPage} of {Math.ceil(books.length / booksPerPage)}
+            </span>
+            <button
+              onClick={goToNextPage}
+              disabled={currentPage === Math.ceil(books.length / booksPerPage)}
+              className='pagination-button'
+            >
+              Next
+            </button>
+          </div>
+        )}
+
+        {/* Selector para cambiar libros por página */}
+        {!loading && !apiError && (
+          <div className='books-per-page-selector'>
+            <label htmlFor='booksPerPage'>Books per page:</label>
+            <select
+              id='booksPerPage'
+              value={booksPerPage}
+              onChange={(e) => setBooksPerPage(Number(e.target.value))}
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={30}>30</option>
+            </select>
+          </div>
+        )}
       </main>
       <Footer />
     </div>
