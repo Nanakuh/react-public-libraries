@@ -9,6 +9,7 @@ const App = () => {
   const [apiError, setApiError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [booksPerPage, setBooksPerPage] = useState(20); // Ahora es dinámico
+  const [inputPage, setInputPage] = useState(""); // Guarda lo que el usuario escribe
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -62,7 +63,19 @@ const App = () => {
       setCurrentPage(currentPage - 1);
     }
   };
-
+  const handleGoToPage = () => {
+    const pageNumber = Number(inputPage); // Convertimos el input a número
+  
+    // Validamos que sea un número dentro del rango permitido
+    if (!pageNumber || pageNumber < 1 || pageNumber > Math.ceil(books.length / booksPerPage)) {
+      alert("Please enter a valid page number.");
+      return; // Si el número no es válido, detenemos la función
+    }
+  
+    setCurrentPage(pageNumber); // Actualizamos la página actual
+    setInputPage(""); // Limpiamos el input después de cambiar de página
+  };
+  
   return (
     <div>
       <Header />
@@ -80,6 +93,7 @@ const App = () => {
             />
           ))}
 
+        {/* Controles de paginación */}
         {!loading && !apiError && (
           <div className='pagination-controls'>
             <button
@@ -102,6 +116,23 @@ const App = () => {
           </div>
         )}
 
+        {/* Input para ir a una página específica */}
+        {!loading && !apiError && (
+          <div className='go-to-page'>
+            <label htmlFor='pageInput'>Go to page:</label>
+            <input
+              id='pageInput'
+              type='number'
+              value={inputPage}
+              onChange={(e) => setInputPage(e.target.value)}
+              min='1'
+              max={Math.ceil(books.length / booksPerPage)}
+              placeholder='Enter page...'
+            />
+            <button onClick={handleGoToPage}>Go</button>
+          </div>
+        )}
+
         {/* Selector para cambiar libros por página */}
         {!loading && !apiError && (
           <div className='books-per-page-selector'>
@@ -118,6 +149,7 @@ const App = () => {
           </div>
         )}
       </main>
+
       <Footer />
     </div>
   );
