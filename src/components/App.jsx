@@ -3,30 +3,34 @@ import Header from "./Header";
 import Footer from "./Footer";
 import BookCard from "./BookCard";
 
+const API_URL = "https://openlibrary.org/search.json?q=book";
+
 const App = () => {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [booksPerPage, setBooksPerPage] = useState(20); // Ahora es dinámico
-  const [inputPage, setInputPage] = useState(""); // Guarda lo que el usuario escribe
+  const [booksPerPage, setBooksPerPage] = useState(20);
+  const [inputPage, setInputPage] = useState("");
 
   useEffect(() => {
     const fetchBooks = async () => {
       setLoading(true);
       setApiError(null);
-
+      
       try {
-        const response = await fetch(
-          "https://openlibrary.org/search.json?q=book"
-        );
+        const response = await fetch(API_URL);
         if (!response.ok) {
           throw new Error(`Error: ${response.status} ${response.statusText}`);
         }
 
         const data = await response.json();
+        if (!data.docs || data.docs.length === 0) {
+          throw new Error("No books found.");
+        }
+
         const booksReadyForUI = data.docs.map((book) => ({
-          key: book.key || Math.random().toString(),
+          key: book.key || `book-${book.cover_i || Math.random().toString(36)}`,
           title: book.title || "Unknown Title",
           cover: book.cover_i
             ? `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`
@@ -39,6 +43,7 @@ const App = () => {
 
         setBooks(booksReadyForUI);
       } catch (e) {
+        console.error(e);
         setApiError(e.message);
       } finally {
         setLoading(false);
@@ -63,17 +68,17 @@ const App = () => {
       setCurrentPage(currentPage - 1);
     }
   };
-  const handleGoToPage = () => {
-    const pageNumber = Number(inputPage); // Convertimos el input a número
   
-    // Validamos que sea un número dentro del rango permitido
+  const handleGoToPage = () => {
+    const pageNumber = Number(inputPage);
+    
     if (!pageNumber || pageNumber < 1 || pageNumber > Math.ceil(books.length / booksPerPage)) {
       alert("Please enter a valid page number.");
-      return; // Si el número no es válido, detenemos la función
+      return;
     }
   
-    setCurrentPage(pageNumber); // Actualizamos la página actual
-    setInputPage(""); // Limpiamos el input después de cambiar de página
+    setCurrentPage(pageNumber);
+    setInputPage("");
   };
   
   return (
@@ -93,7 +98,6 @@ const App = () => {
             />
           ))}
 
-        {/* Controles de paginación */}
         {!loading && !apiError && (
           <div className='pagination-controls'>
             <button
@@ -116,7 +120,6 @@ const App = () => {
           </div>
         )}
 
-        {/* Input para ir a una página específica */}
         {!loading && !apiError && (
           <div className='go-to-page'>
             <label htmlFor='pageInput'>Go to page:</label>
@@ -133,7 +136,6 @@ const App = () => {
           </div>
         )}
 
-        {/* Selector para cambiar libros por página */}
         {!loading && !apiError && (
           <div className='books-per-page-selector'>
             <label htmlFor='booksPerPage'>Books per page:</label>
@@ -149,7 +151,6 @@ const App = () => {
           </div>
         )}
       </main>
-
       <Footer />
     </div>
   );
