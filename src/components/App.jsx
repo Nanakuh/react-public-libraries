@@ -17,7 +17,7 @@ const App = () => {
     const fetchBooks = async () => {
       setLoading(true);
       setApiError(null);
-      
+
       try {
         const response = await fetch(API_URL);
         if (!response.ok) {
@@ -53,34 +53,35 @@ const App = () => {
     fetchBooks();
   }, []);
 
+  const totalPages = Math.ceil(books.length / booksPerPage);
   const indexOfLastBook = currentPage * booksPerPage;
   const indexOfFirstBook = indexOfLastBook - booksPerPage;
   const currentBooks = books.slice(indexOfFirstBook, indexOfLastBook);
 
   const goToNextPage = () => {
-    if (currentPage < Math.ceil(books.length / booksPerPage)) {
-      setCurrentPage(currentPage + 1);
-    }
+    setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages));
   };
 
   const goToPreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
+    setCurrentPage((prevPage) => Math.max(prevPage - 1, 1));
   };
-  
+
   const handleGoToPage = () => {
     const pageNumber = Number(inputPage);
-    
-    if (!pageNumber || pageNumber < 1 || pageNumber > Math.ceil(books.length / booksPerPage)) {
+
+    if (!pageNumber || pageNumber < 1 || pageNumber > totalPages) {
       alert("Please enter a valid page number.");
       return;
     }
-  
+
     setCurrentPage(pageNumber);
     setInputPage("");
   };
-  
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [booksPerPage]);
+
   return (
     <div>
       <Header />
@@ -108,11 +109,11 @@ const App = () => {
               Previous
             </button>
             <span>
-              Page {currentPage} of {Math.ceil(books.length / booksPerPage)}
+              Page {currentPage} of {totalPages}
             </span>
             <button
               onClick={goToNextPage}
-              disabled={currentPage === Math.ceil(books.length / booksPerPage)}
+              disabled={currentPage === totalPages}
               className='pagination-button'
             >
               Next
@@ -129,7 +130,7 @@ const App = () => {
               value={inputPage}
               onChange={(e) => setInputPage(e.target.value)}
               min='1'
-              max={Math.ceil(books.length / booksPerPage)}
+              max={totalPages}
               placeholder='Enter page...'
             />
             <button onClick={handleGoToPage}>Go</button>
