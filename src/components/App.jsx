@@ -12,6 +12,7 @@ const App = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [booksPerPage, setBooksPerPage] = useState(20);
   const [inputPage, setInputPage] = useState("");
+  const [searchTitle, setSearchTitle] = useState("");
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -57,6 +58,10 @@ const App = () => {
   const indexOfLastBook = currentPage * booksPerPage;
   const indexOfFirstBook = indexOfLastBook - booksPerPage;
   const currentBooks = books.slice(indexOfFirstBook, indexOfLastBook);
+  const filteredBooks = currentBooks.filter((book) =>
+    book.title.toLowerCase().includes(searchTitle.toLowerCase())
+  );
+  
 
   const goToNextPage = () => {
     setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages));
@@ -85,12 +90,21 @@ const App = () => {
   return (
     <div>
       <Header />
+      <div className='search-bar'>
+        <input
+          type='text'
+          placeholder='Search by title...'
+          value={searchTitle}
+          onChange={(e) => setSearchTitle(e.target.value)}
+        />
+      </div>
+
       <main className='book-list'>
         {loading && <p className='loading-message'>Loading books...</p>}
         {apiError && <p className='error-message'>{apiError}</p>}
         {!loading &&
           !apiError &&
-          currentBooks.map((book) => (
+          filteredBooks.map((book) => (
             <BookCard
               key={book.key}
               title={book.title}
